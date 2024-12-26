@@ -1,0 +1,145 @@
+/* Sayfa boyutunun ve kaydırmanın düzgün çalışabilmesi için body'ye bir minimum yükseklik verelim */
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;  /* Sayfa yüksekliğini belirler */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+/* Kontroller için bir kapsayıcı */
+#controls-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #ddd;
+    position: sticky; /* Sayfanın üst kısmına sabitler */
+    top: 0;
+    z-index: 1000; /* Diğer içeriklerin üstünde kalmasını sağlar */
+}
+
+/* "Okuma hızı" kaydırıcı stili */
+#controls-container input[type="range"] {
+    margin-right: 10px;
+}
+
+#speed-value {
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+/* "Daha Fazla Göster" butonu */
+#load-more-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#load-more-button:hover {
+    background-color: #0056b3;
+}
+
+/* Kartların içinde bulunacağı container (kapsayıcı) */
+#card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    margin: 20px;
+    width: 100%;
+    min-height: 100%;  /* Sayfanın tamamını kaplar */
+    box-sizing: border-box;
+}
+
+/* Kartların temel stili */
+.card {
+    width: 150px;
+    height: 150px;
+    margin: 15px;
+    perspective: 1000px;
+    cursor: pointer; /* Kart üzerine tıklama göstergesini ekledik */
+    transition: border-color 0.3s ease; /* Kenarlık renginin yumuşak geçişi */
+    border: 3px solid transparent; /* Başlangıçta kenarlık transparan */
+}
+
+/* Hover durumunda kartın kenarlığı */
+.card:hover {
+    border-color: #34dbb7; /* Kart üzerine gelindiğinde kenarlık rengi değişir */
+}
+
+/* Kartın iç kısmı */
+.card-inner {
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 1s;
+}
+
+/* Kart yüzeyleri */
+.card-front, .card-back {
+    /* Kartın ön ve arka yüzlerini üst üste yerleştirmek için mutlak konumlandırma gereklidir */
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+}
+
+/* Kartın ön yüzü */
+.card-front {
+    background: #75f1107e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* Kartın arka yüzü */
+.card-back {
+    background: #3b9df8;
+    transform: rotateY(180deg);
+    padding: 10px;
+}
+
+/* Kelime türü yazısının konumu */
+.kelime-cinsi {
+    font-size: 0.8rem;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #f1610d;
+}
+
+/* Kart üzerindeki Arapça kelimenin stili */
+.card-text {
+    font-size: 3.0rem;
+    font-weight: 400;
+    color: #8B4513;  /* Kahverengi renk */
+}
+
+/* Kartın anlam kısmının stili */
+.meaning {
+    font-size: 1.5rem;
+    color: #e90505;  /* Anlam kısmının kırmızı renkte olması */
+    text-align: center;
+}
+
+/* "Fiil" türü için kart kenarlığı */
+.card[data-type="Fiil"] {
+    border-color: rgba(68, 44, 44, 0.637);  /* Fiil türünde kırmızı kenarlık */
+}
+
+/* "İsim" türü için kart kenarlığı */
+.card[data-type="İsim"] {
+    border-color: blue;  /* İsim türünde mavi kenarlık */
+}
+
+/* "Diğer" türü için kart kenarlığı */
+.card[data-type="Diğer"] {
+    border-color: green;  /* Diğer türlerinde yeşil kenarlık */
+}
