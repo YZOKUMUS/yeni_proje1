@@ -65,12 +65,7 @@ body {
     perspective: 1000px;
     cursor: pointer; /* Kart üzerine tıklama göstergesini ekledik */
     transition: border-color 0.3s ease; /* Kenarlık renginin yumuşak geçişi */
-    border: 3px solid transparent; /* Başlangıçta kenarlık transparan */
-}
-
-/* Hover durumunda kartın kenarlığı */
-.card:hover {
-    border-color: #34dbb7; /* Kart üzerine gelindiğinde kenarlık rengi değişir */
+    border: none; /* Kenarlık kaldırıldı */
 }
 
 /* Kartın iç kısmı */
@@ -83,7 +78,6 @@ body {
 
 /* Kart yüzeyleri */
 .card-front, .card-back {
-    /* Kartın ön ve arka yüzlerini üst üste yerleştirmek için mutlak konumlandırma gereklidir */
     position: absolute;
     width: 100%;
     height: 100%;
@@ -106,15 +100,6 @@ body {
     padding: 10px;
 }
 
-/* Kelime türü yazısının konumu */
-.kelime-cinsi {
-    font-size: 0.8rem;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    color: #f1610d;
-}
-
 /* Kart üzerindeki Arapça kelimenin stili */
 .card-text {
     font-size: 3.0rem;
@@ -129,17 +114,12 @@ body {
     text-align: center;
 }
 
-/* "Fiil" türü için kart kenarlığı */
-.card[data-type="Fiil"] {
-    border-color: rgba(68, 44, 44, 0.637);  /* Fiil türünde kırmızı kenarlık */
-}
-
-/* "İsim" türü için kart kenarlığı */
-.card[data-type="İsim"] {
-    border-color: blue;  /* İsim türünde mavi kenarlık */
-}
-
-/* "Diğer" türü için kart kenarlığı */
-.card[data-type="Diğer"] {
-    border-color: green;  /* Diğer türlerinde yeşil kenarlık */
+/* Kart üzerindeki Arapça okunuşu yazan alan */
+.arapca-okunus {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1rem;
+    color: #f1610d;
+    font-weight: bold;
 }

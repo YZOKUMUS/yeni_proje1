@@ -3,22 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemsPerPage = 40;
     let filteredData = [];
     let allData = [];
-
-    // Filtreleme seçenekleri için bir konteyner oluştur
-    const filterContainer = document.createElement('div');
-    filterContainer.id = 'filter-container';
-    filterContainer.innerHTML = `
-        <label for="arabic-root-filter">Arapça Kök'e Göre Filtrele:</label>
-        <select id="arabic-root-filter">
-            <option value="">Tümü</option>
-        </select>
-        
-        <label for="word-type-filter">Kelime Türüne Göre Filtrele:</label>
-        <select id="word-type-filter">
-            <option value="">Tümü</option>
-        </select>
-    `;
-    document.body.insertBefore(filterContainer, document.getElementById('card-container'));
+    let isPlaying = false; // Ses çalıyor mu kontrolü
 
     // JSON verisini yükle
     fetch('assets/kuran.json')
@@ -30,51 +15,14 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(data => {
             allData = data;
-            populateFilters(allData); // Filtreleri doldur
-            filteredData = removeDuplicates(allData); // Duplikatları kaldır
+            filteredData = allData; // Başlangıçta tüm veriyi kullan
             loadCards(filteredData, currentPage, itemsPerPage);
             setupLoadMoreButton();
-            setupFilterHandlers();
         })
         .catch(error => {
             alert('Veriler yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
             console.error('Hata:', error);
         });
-
-    // Aynı kelimeleri kaldırma fonksiyonu
-    function removeDuplicates(data) {
-        const uniqueMap = new Map();
-        data.forEach(item => {
-            if (!uniqueMap.has(item.arabic_word)) {
-                uniqueMap.set(item.arabic_word, item);
-            }
-        });
-        return Array.from(uniqueMap.values());
-    }
-
-    // Filtreleri doldurma fonksiyonu
-    function populateFilters(data) {
-        const arabicRootFilter = document.getElementById('arabic-root-filter');
-        const wordTypeFilter = document.getElementById('word-type-filter');
-
-        // Benzersiz Arapça kökleri bul ve ekle
-        const uniqueRoots = [...new Set(data.map(item => item.arapca_kok).filter(Boolean))].sort();
-        uniqueRoots.forEach(root => {
-            const option = document.createElement('option');
-            option.value = root;
-            option.textContent = root;
-            arabicRootFilter.appendChild(option);
-        });
-
-        // Benzersiz kelime türlerini bul ve ekle
-        const uniqueWordTypes = [...new Set(data.map(item => item.kelime_cinsi1).filter(Boolean))].sort();
-        uniqueWordTypes.forEach(type => {
-            const option = document.createElement('option');
-            option.value = type;
-            option.textContent = type;
-            wordTypeFilter.appendChild(option);
-        });
-    }
 
     // Kartları yükleme fonksiyonu
     function loadCards(data, page, itemsPerPage, append = false) {
@@ -108,7 +56,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function createCard(item) {
         const card = document.createElement('div');
         card.classList.add('card');
-        card.setAttribute('data-type', item.kelime_cinsi1);
 
         const cardInner = document.createElement('div');
         cardInner.classList.add('card-inner');
@@ -128,14 +75,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function createCardFront(item) {
         const cardFront = document.createElement('div');
         cardFront.classList.add('card-front');
+
         const arabicWord = document.createElement('div');
         arabicWord.classList.add('card-text');
         arabicWord.innerText = item.arabic_word;
-        const kelimeCinsi = document.createElement('div');
-        kelimeCinsi.classList.add('kelime-cinsi');
-        kelimeCinsi.innerText = item.kelime_cinsi;
+
+        const arabicReading = document.createElement('div');
+        arabicReading.classList.add('arapca-okunus');
+        arabicReading.innerText = item.arapca_okunus;
+
         cardFront.appendChild(arabicWord);
-        cardFront.appendChild(kelimeCinsi);
+        cardFront.appendChild(arabicReading);
         return cardFront;
     }
 
@@ -146,30 +96,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const turkishMeaning = document.createElement('div');
         turkishMeaning.classList.add('meaning');
         turkishMeaning.innerText = item.turkish_meaning;
-        const kelimeCinsi1 = document.createElement('div');
-        kelimeCinsi1.classList.add('kelime-cinsi1');
-        kelimeCinsi1.innerText = item.kelime_cinsi1;
-
-        if (item.kelime_cinsi1 === 'Fiil') {
-            cardBack.classList.add('fiil');
-        } else if (item.kelime_cinsi1 === 'İsim') {
-            cardBack.classList.add('isim');
-        }
 
         cardBack.appendChild(turkishMeaning);
-        cardBack.appendChild(kelimeCinsi1);
         return cardBack;
     }
 
     // Kart tıklama işlemi
     function handleCardClick(cardInner, item) {
-        const utterance = new SpeechSynthesisUtterance(item.arabic_word);
-        utterance.lang = 'ar';
-        const speedValue = document.getElementById('speed').value;
-        utterance.rate = parseFloat(speedValue) || 1.0;
-        speechSynthesis.speak(utterance);
+        // Eğer bir ses çalıyorsa, başka bir kart tıklanmasın
+        if (isPlaying) return;
 
-        cardInner.style.transform = cardInner.style.transform === 'rotateY(180deg)' ? '' : 'rotateY(180deg)';
+        // Ses çalma durumu aktif hale getir
+        isPlaying = true;
+
+        // Arapça kelimeyi sesli okuma (JSON'dan gelen ses URL'ini kullanarak)
+        const audio = new Audio(item.sound_url);
+        audio.play();
+
+        // Ses bitiminde işlem yapılacak (karte geri dönme işlemi)
+        audio.onended = () => {
+            // Ses bittiğinde kartı ilk hale döndür
+            cardInner.style.transform = '';
+            isPlaying = false;
+        };
+
+        // Kartın ön yüzü ve arka yüzü arasında dönüşüm
+        cardInner.style.transform = 'rotateY(180deg)';
     }
 
     // "Daha Fazla Göster" butonunun fonksiyonu
@@ -179,28 +131,5 @@ document.addEventListener('DOMContentLoaded', () => {
             currentPage++;
             loadCards(filteredData, currentPage, itemsPerPage, true);
         });
-    }
-
-    // Filtreleme işlemleri
-    function setupFilterHandlers() {
-        const arabicRootFilter = document.getElementById('arabic-root-filter');
-        const wordTypeFilter = document.getElementById('word-type-filter');
-
-        arabicRootFilter.addEventListener('change', filterData);
-        wordTypeFilter.addEventListener('change', filterData);
-    }
-
-    // Filtreleme fonksiyonu
-    function filterData() {
-        const arabicRootValue = document.getElementById('arabic-root-filter').value;
-        const wordTypeValue = document.getElementById('word-type-filter').value;
-
-        filteredData = allData.filter(item => {
-            const matchesRoot = arabicRootValue ? item.arapca_kok === arabicRootValue : true;
-            const matchesType = wordTypeValue ? item.kelime_cinsi1 === wordTypeValue : true;
-            return matchesRoot && matchesType;
-        });
-
-        loadCards(filteredData, 1, itemsPerPage);
     }
 });
