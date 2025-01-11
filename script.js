@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let filteredData = [];
     let allData = [];
     let isPlaying = false; // Ses çalıyor mu kontrolü
+    let currentSpeed = 1; // Başlangıçta okuma hızı 1
 
     // JSON verisini yükle
     fetch('assets/kuran.json')
@@ -18,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
             filteredData = allData; // Başlangıçta tüm veriyi kullan
             loadCards(filteredData, currentPage, itemsPerPage);
             setupLoadMoreButton();
+            setupSpeedControl(); // Hız kontrolünü başlat
         })
         .catch(error => {
             alert('Veriler yüklenirken bir hata oluştu. Lütfen tekrar deneyin.');
@@ -103,24 +105,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Kart tıklama işlemi
     function handleCardClick(cardInner, item) {
-        // Eğer bir ses çalıyorsa, başka bir kart tıklanmasın
         if (isPlaying) return;
 
-        // Ses çalma durumu aktif hale getir
         isPlaying = true;
 
-        // Arapça kelimeyi sesli okuma (JSON'dan gelen ses URL'ini kullanarak)
         const audio = new Audio(item.sound_url);
+        audio.playbackRate = currentSpeed; // Hız ayarı
         audio.play();
 
-        // Ses bitiminde işlem yapılacak (karte geri dönme işlemi)
         audio.onended = () => {
-            // Ses bittiğinde kartı ilk hale döndür
             cardInner.style.transform = '';
             isPlaying = false;
         };
 
-        // Kartın ön yüzü ve arka yüzü arasında dönüşüm
         cardInner.style.transform = 'rotateY(180deg)';
     }
 
@@ -130,6 +127,17 @@ document.addEventListener('DOMContentLoaded', () => {
         loadMoreButton.addEventListener('click', () => {
             currentPage++;
             loadCards(filteredData, currentPage, itemsPerPage, true);
+        });
+    }
+
+    // Hız kontrolü ayarı
+    function setupSpeedControl() {
+        const speedControl = document.getElementById('speed');
+        const speedValue = document.getElementById('speed-value');
+
+        speedControl.addEventListener('input', () => {
+            currentSpeed = parseFloat(speedControl.value);
+            speedValue.innerText = currentSpeed.toFixed(1); // Hız değerini güncelle
         });
     }
 });
