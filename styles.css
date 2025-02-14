@@ -110,7 +110,7 @@ body {
 /* Kartın anlam kısmının stili */
 .meaning {
     font-size: 1.5rem;
-    color: #e90505;  /* Anlam kısmının kırmızı renkte olması */
+    color: #f3f0f0;  /* Anlam kısmının kırmızı renkte olması */
     text-align: center;
 }
 
@@ -120,7 +120,7 @@ body {
     top: 10px;
     right: 10px;
     font-size: 1rem;
-    color: #f1610d;
+    color: #f50914;
     font-weight: bold;
 }
 /* Kök kelimesinin stili */
