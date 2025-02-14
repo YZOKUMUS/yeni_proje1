@@ -123,3 +123,10 @@ body {
     color: #f1610d;
     font-weight: bold;
 }
+/* Kök kelimesinin stili */
+.root-word {
+    font-size: 3.2rem;
+    color: #4023e7;  /* Kök kısmı için yeşil renk */
+    text-align: center;
+    margin-top: 10px;
+}

@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentSpeed = 1; // Başlangıçta okuma hızı 1
 
     // JSON verisini yükle
-    fetch('assets/kuran.json')
+    fetch('assets/data.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error('JSON dosyası yüklenemedi');
@@ -80,11 +80,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const arabicWord = document.createElement('div');
         arabicWord.classList.add('card-text');
-        arabicWord.innerText = item.arabic_word;
+        arabicWord.innerText = item.kelime;  // Arapça kelime
 
         const arabicReading = document.createElement('div');
         arabicReading.classList.add('arapca-okunus');
-        arabicReading.innerText = item.arapca_okunus;
+        arabicReading.innerText = item.translit;  // Arapça okunuş
 
         cardFront.appendChild(arabicWord);
         cardFront.appendChild(arabicReading);
@@ -92,16 +92,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Kart arka yüzünü oluşturma
-    function createCardBack(item) {
-        const cardBack = document.createElement('div');
-        cardBack.classList.add('card-back');
-        const turkishMeaning = document.createElement('div');
-        turkishMeaning.classList.add('meaning');
-        turkishMeaning.innerText = item.turkish_meaning;
+function createCardBack(item) {
+    const cardBack = document.createElement('div');
+    cardBack.classList.add('card-back');
+    
+    const turkishMeaning = document.createElement('div');
+    turkishMeaning.classList.add('meaning');
+    turkishMeaning.innerText = item.anlam;  // Türkçe anlam
 
-        cardBack.appendChild(turkishMeaning);
-        return cardBack;
-    }
+    const rootWord = document.createElement('div');
+    rootWord.classList.add('root-word');  // Köken kelimesi için yeni bir sınıf ekledik
+    rootWord.innerText = item.kok;  // Arapça kök bilgisi
+
+    cardBack.appendChild(turkishMeaning);
+    cardBack.appendChild(rootWord);  // Kök bilgisini ekledik
+    return cardBack;
+}
+
 
     // Kart tıklama işlemi
     function handleCardClick(cardInner, item) {
@@ -109,8 +116,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         isPlaying = true;
 
-        const audio = new Audio(item.sound_url);
-        audio.playbackRate = currentSpeed; // Hız ayarı
+        const audio = new Audio(item.ses_dosyasi);  // Ses dosyasını yükle
+        audio.playbackRate = currentSpeed;  // Hız ayarı
         audio.play();
 
         audio.onended = () => {
@@ -137,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         speedControl.addEventListener('input', () => {
             currentSpeed = parseFloat(speedControl.value);
-            speedValue.innerText = currentSpeed.toFixed(1); // Hız değerini güncelle
+            speedValue.innerText = currentSpeed.toFixed(1);  // Hız değerini güncelle
         });
     }
 });
